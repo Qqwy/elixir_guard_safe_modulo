@@ -18,11 +18,14 @@ Benchee.run(
     end
   },
   time: 5,
-  formatters: [{Benchee.Formatters.Console, extended_statistics: true}],
+  formatters: [
+    Benchee.Formatters.HTML,
+    {Benchee.Formatters.Console, extended_statistics: true}
+  ],
   inputs: %{
     "1" => Enum.take(args, 1),
     "100" => Enum.take(args, 100),
-    "1_000" => Enum.take(args, 1_000),
-    "10_000" => Enum.take(args, 10_000),
+    "1000" => Enum.take(args, 1_000),
+    "10000" => Enum.take(args, 10_000),
   }
 )

@@ -29,6 +29,7 @@ defmodule Modulo.Mixfile do
   defp deps do
     [
       {:benchee, "~> 1.0", only: :dev},
+      {:benchee_html, "~> 1.0", only: :dev},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]}
     ]
   end
