@@ -14,7 +14,7 @@ defmodule Modulo.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :stream_data]]
   end
 
   # Dependencies can be Hex packages:
@@ -27,6 +27,9 @@ defmodule Modulo.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:benchee, "~> 1.0", only: :dev},
+      {:stream_data, "~> 0.5.0", only: [:dev, :test]}
+    ]
   end
 end

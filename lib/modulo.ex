@@ -29,7 +29,15 @@ defmodule Modulo do
     IO.inspect(Macro.to_string(res))
     res
   end
-  
+
+  # Only exposed for the benchmark
+  @doc false
+  defmacro guard_safe_mod(dividend, divisor) do
+    quote do
+      unquote(dividend) - (unquote(divisor) * unquote(floor_div(dividend, divisor)))
+    end
+  end
+
   @doc """
   Computes the modulo remainder of an integer division.
 
@@ -57,9 +65,7 @@ defmodule Modulo do
     in_module? = (__CALLER__.context == nil)
     if not in_module? do
       # Guard-clause implementation
-      quote do
-        unquote(dividend) - (unquote(divisor) * unquote(floor_div(dividend, divisor)))
-      end
+      guard_safe_mod(dividend, divisor)
     else
       # Normal implementation
       quote do
@@ -73,4 +79,5 @@ defmodule Modulo do
       end
     end
   end
+
 end
