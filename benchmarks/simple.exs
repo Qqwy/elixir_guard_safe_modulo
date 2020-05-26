@@ -1,4 +1,5 @@
 require Modulo
+require Integer
 
 dividends = StreamData.integer()
 divisors  = StreamData.integer() |> StreamData.filter(&(&1 != 0))
@@ -7,10 +8,13 @@ args =
 
 Benchee.run(
   %{
-    "Modulo.mod (body)" => fn input ->
+    "mod (non-guard)" => fn input ->
       Enum.map(input, fn {a, b}  -> Modulo.mod(a, b) end)
     end,
-    "Modulo.mod (guard)" => fn input ->
+    "mod (unoptimized guard)" => fn input ->
+      Enum.map(input, fn {a, b}  -> Modulo.unoptimized_guard_safe_mod(a, b) end)
+    end,
+    "mod (optimized guard)" => fn input ->
       Enum.map(input, fn {a, b}  -> Modulo.guard_safe_mod(a, b) end)
     end,
     "rem" => fn input ->
