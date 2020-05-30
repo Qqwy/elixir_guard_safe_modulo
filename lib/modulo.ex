@@ -22,14 +22,40 @@ defmodule Modulo do
   # Erlang's BIF `div/2` rounds towards zero.
   # `floor_div/2` always rounds down.
   # see https://en.wikipedia.org/wiki/Modulo_operation
-  defp floor_div(a, n) do
+  defp unoptimized_floor_div(a, n) do
     res = quote do
       div(unquote(a), unquote(n)) + div(unquote(int_sign(quote do rem(unquote(a), unquote(n)) * unquote(n) end)) - 1, 2)
     end
-    IO.inspect(Macro.to_string(res))
     res
   end
-  
+
+  # Only exposed directly for the benchmark
+  @doc false
+  defmacro unoptimized_guard_safe_mod(dividend, divisor) do
+    quote do
+      unquote(dividend) - (unquote(divisor) * unquote(unoptimized_floor_div(dividend, divisor)))
+    end
+  end
+
+  # Integer Floor Division, 
+  # Erlang's BIF `div/2` rounds towards zero.
+  # `floor_div/2` always rounds down.
+  # see https://en.wikipedia.org/wiki/Modulo_operation
+  defp floor_div(a, n) do
+    res = quote do
+      div(unquote(a), unquote(n)) + (rem(unquote(a), unquote(n)) * unquote(n) >>> abs(unquote(a) * unquote(n)))
+    end
+    res
+  end
+
+  # Only exposed directly for the benchmark
+  @doc false
+  defmacro guard_safe_mod(dividend, divisor) do
+    quote do
+      unquote(dividend) - (unquote(divisor) * unquote(floor_div(dividend, divisor)))
+    end
+  end
+
   @doc """
   Computes the modulo remainder of an integer division.
 
@@ -57,9 +83,7 @@ defmodule Modulo do
     in_module? = (__CALLER__.context == nil)
     if not in_module? do
       # Guard-clause implementation
-      quote do
-        unquote(dividend) - (unquote(divisor) * unquote(floor_div(dividend, divisor)))
-      end
+      guard_safe_mod(dividend, divisor)
     else
       # Normal implementation
       quote do
@@ -73,4 +97,5 @@ defmodule Modulo do
       end
     end
   end
+
 end
